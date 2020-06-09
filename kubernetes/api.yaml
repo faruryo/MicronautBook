@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-api
+spec:
+  selector:
+    app: book-api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: book-api
+  name: book-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: book-api
+  template:
+    metadata:
+      labels:
+        app: book-api
+    spec:
+      containers:
+        - name: book
+          image: faruryo/micronaut-book
+          imagePullPolicy: Never
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "1000m"

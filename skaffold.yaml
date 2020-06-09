@@ -1,0 +1,17 @@
+apiVersion: skaffold/v2beta4
+kind: Config
+metadata:
+  name: micronaut-book-
+build:
+  artifacts:
+    - image: faruryo/micronaut-book
+      jib: {}
+deploy:
+  kubectl:
+    manifests:
+      - kubernetes/api.yaml
+portForward:
+  - resourceType: service
+    resourceName: book-api
+    port: 8080
+    localPort: 8080
