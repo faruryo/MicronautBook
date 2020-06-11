@@ -27,6 +27,15 @@ open class BookController(private val bookRepository: BookRepository) {
         return HttpStatus.CREATED
     }
 
+    @Put("/{id}")
+    open fun updateById(id: Long, @Size(max = 1024) @Body newBook: Book): HttpStatus {
+        val updatingBook = bookRepository.findById(id).get()
+        updatingBook.title = newBook.title
+        updatingBook.author = newBook.author
+        bookRepository.update(updatingBook)
+        return HttpStatus.OK
+    }
+
     @Delete("/{id}")
     open fun delete(id: Long): HttpStatus {
         bookRepository.deleteById(id)
