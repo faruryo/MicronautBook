@@ -6,13 +6,19 @@ import javax.validation.constraints.Size
 
 import micronaut.book.domain.Book
 import micronaut.book.repository.BookRepository
+import java.util.Optional
 
 @Controller("/book")
 open class BookController(private val bookRepository: BookRepository) {
 
     @Get("/")
-    fun read(): MutableIterable<Book> {
+    fun readAll(): MutableIterable<Book> {
         return bookRepository.findAll()
+    }
+
+    @Get("/{id}")
+    fun readById(id: Long): Optional<Book> {
+        return bookRepository.findById(id)
     }
 
     @Post("/")
