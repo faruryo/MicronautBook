@@ -26,4 +26,10 @@ open class BookController(private val bookRepository: BookRepository) {
         bookRepository.save(book)
         return HttpStatus.CREATED
     }
+
+    @Delete("/{id}")
+    open fun delete(id: Long): HttpStatus {
+        bookRepository.deleteById(id)
+        return HttpStatus.OK
+    }
 }
