@@ -32,6 +32,12 @@ spec:
         - name: book
           image: faruryo/micronaut-book
           imagePullPolicy: Never
+          env:
+            - name: MICRONAUT_ENVIRONMENTS
+              value: local
+          envFrom:
+              - configMapRef:
+                  name: mysql-env
           resources:
             requests:
               memory: "256Mi"

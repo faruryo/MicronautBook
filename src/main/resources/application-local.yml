@@ -1,0 +1,15 @@
+---
+datasources:
+  default:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}/${MYSQL_DATABASE:book}?charset=utf8mb4
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USER:book}
+    password: ${MYSQL_PASSWORD:book}
+
+jpa:
+  default:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        show_sql: true

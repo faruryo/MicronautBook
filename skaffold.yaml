@@ -10,6 +10,7 @@ deploy:
   kubectl:
     manifests:
       - kubernetes/api.yaml
+      - kubernetes/mysql.yaml
 portForward:
   - resourceType: service
     resourceName: book-api
