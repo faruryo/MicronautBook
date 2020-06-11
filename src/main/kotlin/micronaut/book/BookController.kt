@@ -1,5 +1,6 @@
 package micronaut.book
 
+import io.micronaut.data.model.Pageable
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.annotation.*
 import javax.validation.constraints.Size
@@ -12,8 +13,8 @@ import java.util.Optional
 open class BookController(private val bookRepository: BookRepository) {
 
     @Get("/")
-    fun readAll(): MutableIterable<Book> {
-        return bookRepository.findAll()
+    fun readAll(pageable: Pageable): MutableIterable<Book> {
+        return bookRepository.list(Pageable.from(pageable.number, pageable.size))
     }
 
     @Get("/{id}")
