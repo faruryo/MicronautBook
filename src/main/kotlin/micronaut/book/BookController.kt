@@ -13,13 +13,14 @@ import java.util.Optional
 open class BookController(private val bookRepository: BookRepository) {
 
     @Get("/")
-    fun readAll(pageable: Pageable): MutableIterable<Book> {
-        return bookRepository.list(Pageable.from(pageable.number, pageable.size))
+    fun readAll(pageable: Pageable): List<Book> {
+        val slicedBook = bookRepository.list(Pageable.from(pageable.number, pageable.size))
+        return slicedBook.content
     }
 
     @Get("/{id}")
-    fun readById(id: Long): Optional<Book> {
-        return bookRepository.findById(id)
+    fun readById(id: Long): Book? {
+        return bookRepository.findById(id).orElse(null)
     }
 
     @Post("/")
@@ -30,7 +31,8 @@ open class BookController(private val bookRepository: BookRepository) {
 
     @Put("/{id}")
     open fun updateById(id: Long, @Size(max = 1024) @Body newBook: Book): HttpStatus {
-        val updatingBook = bookRepository.findById(id).get()
+        val updatingBook = bookRepository.findById(id).orElse(null) ?: return HttpStatus.NOT_FOUND
+
         updatingBook.title = newBook.title
         updatingBook.author = newBook.author
         bookRepository.update(updatingBook)

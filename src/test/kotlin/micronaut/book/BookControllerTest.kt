@@ -7,23 +7,121 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.test.annotation.MicronautTest
+import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
+import io.kotlintest.assertions.json.shouldMatchJson
+import io.kotlintest.shouldThrow
+import io.micronaut.http.client.exceptions.HttpClientResponseException
+import micronaut.book.domain.Book
 
 @MicronautTest
 class BookControllerTest(ctx: ApplicationContext): StringSpec({
 
+    "check environment" {
+        ctx.environment.activeNames shouldContain "test"
+    }
+
     "test the server is running" {
-        assert(ctx.getBean(EmbeddedServer::class.java).isRunning)
+        ctx.getBean(EmbeddedServer::class.java).isRunning shouldBe true
     }
 
     "BookController server" {
         val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
         val client: RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url)
 
-        // "a request is made to index"
         val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book"), String::class.java)
 
-        // "the response is successful"
+        response.status shouldBe HttpStatus.OK
+
+    }
+
+    "check GET /book データ0件" {
+        val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
+        val client: RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url)
+
+        val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book"), String::class.java)
+
+        response.status shouldBe HttpStatus.OK
+        response.body.get().shouldMatchJson("[]")
+    }
+
+    "check POST /book データ登録" {
+        val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
+        val client: RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url)
+
+        val book = Book(id=0,title="title",author="author")
+        val response = client.toBlocking().exchange(HttpRequest.POST("/book", book), String::class.java)
+
+        response.status shouldBe HttpStatus.CREATED
+    }
+
+    "check GET /book データ1件" {
+        val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
+        val client: RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url)
+
+        val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book"), String::class.java)
+
+        response.status shouldBe HttpStatus.OK
+        response.body.get().shouldMatchJson("[{\"id\":1,\"title\":\"title\",\"author\":\"author\"}]")
+
+    }
+
+    "check GET /book/{id} 存在する場合" {
+        val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
+        val client: RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url)
+
+        val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book/1"), String::class.java)
+
+        response.status shouldBe HttpStatus.OK
+        response.body.get().shouldMatchJson("{\"id\":1,\"title\":\"title\",\"author\":\"author\"}")
+    }
+
+    "check GET /book/{id} 存在しない場合" {
+        val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
+        val client: RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url)
+
+        val exception = shouldThrow<HttpClientResponseException> {
+            client.toBlocking().exchange(HttpRequest.GET<String>("/book/0"), String::class.java)
+        }
+        exception.response.status shouldBe HttpStatus.NOT_FOUND
+    }
+
+    "check PUT /book/{id} 存在する場合" {
+        val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
+        val client: RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url)
+
+        val book = Book(id=0,title="title",author="author")
+        val response = client.toBlocking().exchange(HttpRequest.PUT("/book/1", book), String::class.java)
+
+        response.status shouldBe HttpStatus.OK
+    }
+
+    "check PUT /book/{id} 存在しない場合" {
+        val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
+        val client: RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url)
+
+        val book = Book(id=0,title="title",author="author")
+        val exception = shouldThrow<HttpClientResponseException> {
+            client.toBlocking().exchange(HttpRequest.PUT("/book/0", book), String::class.java)
+        }
+        exception.response.status shouldBe HttpStatus.NOT_FOUND
+    }
+
+    "check DELETE /book/{id} 存在する場合" {
+        val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
+        val client: RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url)
+
+        val response = client.toBlocking().exchange(HttpRequest.DELETE<String>("/book/1"), String::class.java)
+
+        response.status shouldBe HttpStatus.OK
+    }
+
+    "check DELETE /book/{id} 存在しない場合" {
+        val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
+        val client: RxHttpClient = embeddedServer.applicationContext.createBean(RxHttpClient::class.java, embeddedServer.url)
+
+        val response = client.toBlocking().exchange(HttpRequest.DELETE<String>("/book/1"), String::class.java)
+
         response.status shouldBe HttpStatus.OK
     }
 })
