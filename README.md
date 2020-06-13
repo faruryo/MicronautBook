@@ -20,3 +20,4 @@ mn create-app micronaut-book --lang kotlin --build gradle --features data-hibern
 
 - IDEA のRun構成で「micronaut-book [test]」を選ぶとgradle testによりテストが実行される
 - IDEA のRun構成で「Develop on Kubernetes」を選ぶとskaffoldによりローカルKubernetes環境にデプロイされる。プログラムに変更を加えるたびに自動的にデプロイされるため、継続的に動作確認が可能になる。
+  - Run開始時はmysql立ち上げに時間を要するため、1分ほど待つ必要あり

@@ -45,3 +45,15 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "1000m"
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /book
+            failureThreshold: 2
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /book
+            failureThreshold: 5
+            periodSeconds: 5
