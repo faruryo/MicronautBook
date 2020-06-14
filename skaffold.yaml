@@ -4,7 +4,7 @@ metadata:
   name: micronaut-book-
 build:
   artifacts:
-    - image: faruryo/micronaut-book
+    - image: faruryo/micronaut-book-api
       jib: {}
 deploy:
   kubectl:

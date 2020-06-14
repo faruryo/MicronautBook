@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: book
-          image: faruryo/micronaut-book
+          image: faruryo/micronaut-book-api
           imagePullPolicy: Never
           env:
             - name: MICRONAUT_ENVIRONMENTS
