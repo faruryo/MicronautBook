@@ -6,6 +6,7 @@ import io.micronaut.http.annotation.*
 import javax.validation.constraints.Size
 
 import micronaut.book.domain.Book
+import micronaut.book.domain.PageResponse
 import micronaut.book.repository.BookRepository
 import javax.validation.Valid
 
@@ -13,9 +14,10 @@ import javax.validation.Valid
 open class BookController(private val bookRepository: BookRepository) {
 
     @Get("/{?pageable*}")
-    open fun readAll(@Valid pageable: Pageable): List<Book> {
+    open fun readAll(@Valid pageable: Pageable): PageResponse<Book> {
         val slicedBook = bookRepository.list(pageable)
-        return slicedBook.content
+        val count = bookRepository.count()
+        return PageResponse(count=count, results=slicedBook.content)
     }
 
     @Get("/{id}")

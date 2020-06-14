@@ -11,12 +11,12 @@ import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.assertions.json.shouldMatchJson
 import io.kotlintest.data.forall
-import io.kotlintest.forAll
 import io.kotlintest.shouldThrow
 import io.kotlintest.tables.row
 import io.micronaut.core.type.Argument
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import micronaut.book.domain.Book
+import micronaut.book.domain.PageResponse
 
 @MicronautTest
 class BookControllerTest(ctx: ApplicationContext): StringSpec() {
@@ -48,7 +48,7 @@ class BookControllerTest(ctx: ApplicationContext): StringSpec() {
             val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book"), String::class.java)
 
             response.status shouldBe HttpStatus.OK
-            response.body.get().shouldMatchJson("[]")
+            response.body.get().shouldMatchJson("{\"count\":0}")
         }
 
         "check POST /book データ登録" {
@@ -62,7 +62,7 @@ class BookControllerTest(ctx: ApplicationContext): StringSpec() {
             val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book"), String::class.java)
 
             response.status shouldBe HttpStatus.OK
-            response.body.get().shouldMatchJson("[{\"id\":1,\"title\":\"title\",\"author\":\"author\"}]")
+            response.body.get().shouldMatchJson("{\"count\":1,\"results\":[{\"id\":1,\"title\":\"title\",\"author\":\"author\"}]}")
         }
 
         "check GET /book/{id} 存在する場合" {
@@ -88,7 +88,7 @@ class BookControllerTest(ctx: ApplicationContext): StringSpec() {
             val readResponse = client.toBlocking().exchange(HttpRequest.GET<String>("/book"), String::class.java)
 
             readResponse.status shouldBe HttpStatus.OK
-            readResponse.body.get().shouldMatchJson("[{\"id\":1,\"title\":\"PUT /book/{id} 存在する場合 title\",\"author\":\"PUT /book/{id} 存在する場合 author\"}]")
+            readResponse.body.get().shouldMatchJson("{\"count\":1,\"results\":[{\"id\":1,\"title\":\"PUT /book/{id} 存在する場合 title\",\"author\":\"PUT /book/{id} 存在する場合 author\"}]}")
         }
 
         "check PUT /book/{id} 存在しない場合" {
@@ -107,7 +107,7 @@ class BookControllerTest(ctx: ApplicationContext): StringSpec() {
             val readResponse = client.toBlocking().exchange(HttpRequest.GET<String>("/book"), String::class.java)
 
             readResponse.status shouldBe HttpStatus.OK
-            readResponse.body.get().shouldMatchJson("[]")
+            readResponse.body.get().shouldMatchJson("{\"count\":0}")
         }
 
         "check DELETE /book/{id} 存在しない場合" {
@@ -129,35 +129,39 @@ class BookControllerTest(ctx: ApplicationContext): StringSpec() {
         }
 
         "check GET /book page/sort試験 sort=id ASC" {
-            val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book?size=1&page=0&sort=id"), Argument.of(List::class.java, Book::class.java))
-            val book: Book = response.body.get()[0] as Book
+            val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book?size=1&page=0&sort=id"), Argument.of(PageResponse::class.java, Book::class.java))
+            val book: Book = response.body.get().results[0] as Book
             response.status shouldBe HttpStatus.OK
             book.title shouldBe "A"
-            response.body.get().size shouldBe 1
+            response.body.get().results.size shouldBe 1
+            response.body.get().count shouldBe 3
         }
 
         "check GET /book page/sort試験 sort=idはASC 2ページ目" {
-            val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book?size=1&page=1&sort=id"), Argument.of(List::class.java, Book::class.java))
-            val book: Book = response.body.get()[0] as Book
+            val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book?size=1&page=1&sort=id"), Argument.of(PageResponse::class.java, Book::class.java))
+            val book: Book = response.body.get().results[0] as Book
             response.status shouldBe HttpStatus.OK
             book.title shouldBe "B"
-            response.body.get().size shouldBe 1
+            response.body.get().results.size shouldBe 1
+            response.body.get().count shouldBe 3
         }
 
         "check GET /book page/sort試験 sort=id,desc" {
-            val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book?size=1&page=0&sort=id,desc"), Argument.of(List::class.java, Book::class.java))
-            val book: Book = response.body.get()[0] as Book
+            val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book?size=1&page=0&sort=id,desc"), Argument.of(PageResponse::class.java, Book::class.java))
+            val book: Book = response.body.get().results[0] as Book
             response.status shouldBe HttpStatus.OK
             book.title shouldBe "C"
-            response.body.get().size shouldBe 1
+            response.body.get().results.size shouldBe 1
+            response.body.get().count shouldBe 3
         }
 
         "check GET /book page/sort試験 sort=author ASC" {
-            val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book?size=1&page=0&sort=author"), Argument.of(List::class.java, Book::class.java))
-            val book: Book = response.body.get()[0] as Book
+            val response = client.toBlocking().exchange(HttpRequest.GET<String>("/book?size=1&page=0&sort=author"), Argument.of(PageResponse::class.java, Book::class.java))
+            val book: Book = response.body.get().results[0] as Book
             response.status shouldBe HttpStatus.OK
             book.title shouldBe "C"
-            response.body.get().size shouldBe 1
+            response.body.get().results.size shouldBe 1
+            response.body.get().count shouldBe 3
         }
     }
 }
