@@ -7,18 +7,19 @@ import javax.validation.constraints.Size
 
 import micronaut.book.domain.Book
 import micronaut.book.repository.BookRepository
+import javax.validation.Valid
 
 @Controller("/book")
 open class BookController(private val bookRepository: BookRepository) {
 
-    @Get("/")
-    fun readAll(pageable: Pageable): List<Book> {
-        val slicedBook = bookRepository.list(Pageable.from(pageable.number, pageable.size))
+    @Get("/{?pageable*}")
+    open fun readAll(@Valid pageable: Pageable): List<Book> {
+        val slicedBook = bookRepository.list(pageable)
         return slicedBook.content
     }
 
     @Get("/{id}")
-    fun readById(id: Long): Book? {
+    open fun readById(@PathVariable id: Long): Book? {
         return bookRepository.findById(id).orElse(null)
     }
 
@@ -29,7 +30,7 @@ open class BookController(private val bookRepository: BookRepository) {
     }
 
     @Put("/{id}")
-    open fun updateById(id: Long, @Size(max = 1024) @Body newBook: Book): HttpStatus {
+    open fun updateById(@PathVariable id: Long, @Size(max = 1024) @Body newBook: Book): HttpStatus {
         val updatingBook = bookRepository.findById(id).orElse(null) ?: return HttpStatus.NOT_FOUND
 
         updatingBook.title = newBook.title
@@ -39,7 +40,7 @@ open class BookController(private val bookRepository: BookRepository) {
     }
 
     @Delete("/{id}")
-    open fun delete(id: Long): HttpStatus {
+    open fun delete(@PathVariable id: Long): HttpStatus {
         bookRepository.deleteById(id)
         return HttpStatus.OK
     }
