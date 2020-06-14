@@ -7,7 +7,6 @@ import javax.validation.constraints.Size
 
 import micronaut.book.domain.Book
 import micronaut.book.repository.BookRepository
-import java.util.Optional
 
 @Controller("/book")
 open class BookController(private val bookRepository: BookRepository) {
