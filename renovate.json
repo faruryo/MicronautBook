@@ -6,9 +6,9 @@
   "packageRules": [
     {
       "updateTypes": ["minor", "patch", "pin", "digest"],
-      "schedule": ["on the first day of the month"],
       "automerge": true,
-      "assignees": ["faruryo"]
     }
-  ]
+  ],
+  "assignees": ["faruryo"],
+  "schedule": ["on the first day of the month"],
 }
