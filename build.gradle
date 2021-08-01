@@ -44,7 +44,7 @@ dependencies {
     runtimeOnly "com.fasterxml.jackson.module:jackson-module-kotlin:2.12.3"
     runtimeOnly "com.h2database:h2"
     runtimeOnly "mysql:mysql-connector-java:8.0.25"
-    runtimeOnly "ch.qos.logback:logback-classic:1.2.3"
+    runtimeOnly "ch.qos.logback:logback-classic:1.2.5"
     testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
     testImplementation "io.micronaut.test:micronaut-test-kotlintest"
     testImplementation "io.mockk:mockk:1.12.0"
