@@ -41,7 +41,7 @@ dependencies {
     kapt "io.micronaut.data:micronaut-data-processor"
     kaptTest platform("io.micronaut:micronaut-bom:$micronautVersion")
     kaptTest "io.micronaut:micronaut-inject-java"
-    runtimeOnly "com.fasterxml.jackson.module:jackson-module-kotlin:2.12.5"
+    runtimeOnly "com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3"
     runtimeOnly "com.h2database:h2"
     runtimeOnly "mysql:mysql-connector-java:8.0.29"
     runtimeOnly "ch.qos.logback:logback-classic:1.2.11"
